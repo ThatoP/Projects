@@ -1,5 +1,6 @@
 /**
  * @author Thato Puoetsile
+ * @aboutAuthor B.Eng (Information and Communication Engineering) 
  * @user Records Management Unit
  */
 import java.awt.*;
@@ -9,10 +10,11 @@ import java.awt.event.*;
 public class HomeScreen extends JFrame{
 
 	int width, height;
+	static HomeScreen home;
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				new HomeScreen();
+				home = new HomeScreen();
 			};
 		});
 	}
@@ -43,12 +45,10 @@ public class HomeScreen extends JFrame{
 		back.add(newForm);
 		newForm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				dispose();
+				home.dispose();
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						MailProcessingForm form = new MailProcessingForm();
-						form.setVisible(true);						
 					}
 				});
 			}
