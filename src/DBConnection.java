@@ -25,6 +25,7 @@ public class DBConnection {
 	public static void main(String[] args) {
 		DBConnection dbcon = new DBConnection();
 		dbcon.createConnection();
+		
 		//System.out.println("Database Connection Successful!!");
 	}
 	
@@ -32,7 +33,9 @@ public class DBConnection {
 		try{
 			//Get a connection to the database
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/rmunit?useSSL=false","root","RMUnit");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/rmunit?useSSL=false&zeroDateTimeBehavior=CONVERT_TO_NULL",
+					"root","RMUnit");
+			//System.out.println("Database connection has been created!");
 		}
 		catch (ClassNotFoundException ex){
 			Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE,null,ex);
@@ -45,23 +48,52 @@ public class DBConnection {
 	public static void save (String[] data) {
 		createConnection(); //Get a connection to the database
 		try {
-			myStmt = con.createStatement(); //Creating a statement
-			String dbop = "INSERT INTO rmunit.inmail VALUES ('" + data[0] + "','" + data[1] + "', '" + data[2] + "', '" + data[3] + "', '"
-					+ data[4] + "', '"+ data[5] +"', '" + data[6] + "', '" + data[7] + "')";
+			String dbop = "INSERT INTO rmunit.inmail (RefNumber, DateOnLetter, OriginDept, Subject, DateRec, ActionOfficer, DateMarked,"
+					+ "Days, ActDate,DaysToAct)VALUES (?,?,?,?,?,?,?,?,?,?)";
+			
+			//Creating a statement
+			stmt = con.prepareStatement(dbop); 
+			
+			// Set parameters
+			stmt.setString(1, data[0]);
+			stmt.setNull(2, java.sql.Types.DATE);
+			stmt.setString(3, data[2]);
+			stmt.setString(4, data[3]);
+			stmt.setNull(5, java.sql.Types.DATE);
+			stmt.setString(6, data[5]);
+			stmt.setNull(7, java.sql.Types.DATE);
+			stmt.setString(8, data[7]);
+			stmt.setNull(9, java.sql.Types.DATE);
+			stmt.setString(10, data[9]);
+			
+			// Executing the String
+			res = stmt.executeQuery();
+			
+			
 			//INSERT INTO RMUNIT VALUES ('RefNum','DateOnLetter','OrigDept','Subject','DateRec','ActionOfficer','DateMarked','Days');
-			myStmt.execute(dbop);
+			//String dbop = "INSERT INTO rmunit.inmail VALUES ('" + data[0] + "','" + data[1] + "', '" + data[2] + "', '" + data[3] + "', '"
+			//		+ data[4] + "', '"+ data[5] +"', '" + data[6] + "', '" + data[7] + "','"+ data[8] +"', '"+ data[9] +"')";
+			//System.out.println(dbop);
+			//myStmt.execute(dbop);
+			
+			while (res.next()) {
+			      for (int i = 1; i <= 10; i++) {
+			        System.out.print(res.getString(i) + "  ,");
+			      }
+			      System.out.println();
+			    }
+
 			JOptionPane.showMessageDialog(null, "This record has been saved successfully!", "RECORD SAVED", 1);
 			myStmt.close();
 		}
 		catch (SQLException ex) {
-			//Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE,null,ex);
 			JOptionPane.showMessageDialog(null, "This record has not been saved!", "WARNING", 0);
 		}
 	}
 	
 	public static String[] fetchRecord (String str) {
 		createConnection();
-		String[] data = new String[8];
+		String[] data = new String[10];
 		try {
 			// Prepare the statement
 			stmt = con.prepareStatement("SELECT * FROM rmunit.inmail WHERE RefNumber=?");
@@ -84,6 +116,10 @@ public class DBConnection {
 					data[5] = res.getString("ActionOfficer");
 					data[6] = res.getString("Datemarked");
 					data[7] = res.getString("Days");
+					data[8] = res.getString("ActDate");
+					data[9] = res.getString("DaysToAct");
+					
+					//MailProcessingForm.save.setEnabled(true);
 				}
 			}else
 				JOptionPane.showMessageDialog(null, "The record could not be found.\n Please confirm the Reference Number.", "WARNING",0);
@@ -94,5 +130,35 @@ public class DBConnection {
 			JOptionPane.showMessageDialog(null, "Oops!! Something went wrong!.", "WARNING", 0);
 		}
 		return data;
+	}
+	
+	public static void delete (String str) {
+		createConnection();
+		
+		try {
+			//creating the statement
+			myStmt = con.createStatement();
+			
+			//Setting the parameters
+			String dbop = "DELETE FROM rmunit.inmail WHERE Refnumber='"+str+"'";
+			
+			if(str.equals(null)) {
+				JOptionPane.showMessageDialog(null, "Reference number is invalid!!", "WARNING", 0);
+				myStmt.close();
+			}else {
+				myStmt.execute(dbop);
+				myStmt.close();
+			}
+			
+			//Executing the statement
+			//myStmt.execute(dbop);
+			
+			//closing the connection
+			//myStmt.close();
+			
+		}catch (SQLException ex) {
+			Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+			JOptionPane.showMessageDialog(null, "Oops!! Something went wrong!.", "WARNING", 0);
+		}
 	}
 }
