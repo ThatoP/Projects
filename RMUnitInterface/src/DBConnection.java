@@ -33,7 +33,6 @@ public class DBConnection {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/rmunit?useSSL=false&zeroDateTimeBehavior=CONVERT_TO_NULL",
 					"root","RMUnit");
-			//System.out.println("Database connection has been created!");
 		}
 		catch (ClassNotFoundException ex){
 			Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE,null,ex);
@@ -160,17 +159,19 @@ public class DBConnection {
 		
 		try {
 			//Prepare the statement
-			stmt = con.prepareStatement("SELECT * FROM rmunit.inmail");
+			stmt = con.prepareStatement("SELECT RefNumber as 'Reference No.', DateOnLetter as 'Date On Letter', OriginDept as 'Origin', "
+					+ "Subject as 'Subject', DateRec as 'Date Recieved', ActionOfficer as 'Action Officer', DateMarked as 'Date Marked',"
+					+ "Days as 'Days To Mark', ActDate as 'Action Date', DaysToAct as 'Days To Act' FROM rmunit.inmail");
 			
-			//Set parameters
-			
-			//Execute query
+			//Execute query right away because there are no parameters to set up
 			res = stmt.executeQuery();
 			
 			//Casting the result set into a JTable
 			table = new JTable (DbUtils.resultSetToTableModel(res));
 			table.setEnabled(false);
 			table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+			table.setFont(new Font("Arial", Font.PLAIN, 14));
+			table.setRowHeight(30);
 			
 			stmt.close();
 			return table;

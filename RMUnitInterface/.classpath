@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="C:/Users/tpuoetsile/Downloads/Software/jcalendar-1.4.jar"/>
 	<classpathentry kind="lib" path="C:/Users/tpuoetsile/Downloads/Software/joda-time-2.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/tpuoetsile/Downloads/Software/rs2xml.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_131/src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -7,9 +7,11 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.*;
+import java.awt.print.PrinterException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.logging.Level;
@@ -55,7 +57,7 @@ public class MailProcessingForm extends JFrame{
 		frame.setIconImage(new ImageIcon("C:\\Users\\tpuoetsile\\Pictures\\dtef.jpg").getImage());
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
-		frame.getContentPane().setLayout(null);;
+		frame.getContentPane().setLayout(null);
 		frame.getContentPane().setBackground(Color.WHITE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -133,8 +135,32 @@ public class MailProcessingForm extends JFrame{
 		actionText.setBounds(750,450,300,30);
 		frame.getContentPane().add(actionText);
 		
+		// The textfield for adding the action officer should be an auto-complete drop-down list
+		// Functionality is yet to be established
+		Document acts = actionText.getDocument();
+		acts.addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
 		//row 7
-		// Field should allow to be input at a later date, and so it follows that Days taken field should be input later
 		JLabel dateMarked = new JLabel("Date Marked");
 		dateMarked.setFont(new Font("Arial",Font.BOLD,18));
 		dateMarked.setBounds(500,510,200,30);
@@ -165,10 +191,7 @@ public class MailProcessingForm extends JFrame{
 			public void calculate () {
 				Instant start;
 				Instant end;
-				//if (((JTextField)dateRecText.getDateEditor().getUiComponent()).getText() != null && 
-				//((JTextField)dateMarkedText.getDateEditor().getUiComponent()).getText() != null) {}
 				if (((JTextField)dateMarkedText.getDateEditor().getUiComponent()).getText().charAt(0)=='0') {
-					//((JTextField)dateMarkedText.getDateEditor().getUiComponent()).setText("1000-01-01");
 					daysText.setText(null);
 					System.out.println("Date marked hasn't been entered yet.");
 				}else {
@@ -343,7 +366,6 @@ public class MailProcessingForm extends JFrame{
 		});
 		
 		//The Delete button deletes a record from the database
-		
 		JButton del = new JButton("Delete Record");
 		del.setFont(new Font("Arial",Font.BOLD,14));
 		del.setBackground(Color.RED);
@@ -459,25 +481,44 @@ public class MailProcessingForm extends JFrame{
 				});
 			}
 		});
-		JMenuItem srch = new JMenuItem("Search By");
-		menu.add(srch);
-		
-		JMenuItem reps = new JMenuItem("Reports");
-		menu.add(reps);
+
 	}
 	
 	public static void showTable() {
 		
 		//Setting up the frame that is to contain the table
 		JFrame fr = new JFrame();
-		fr.setSize(1500,800);
+		fr.setSize(1500,700);
 		fr.setTitle("Records Management Unit - Complete Database");
 		fr.setIconImage(new ImageIcon("C:\\Users\\tpuoetsile\\Pictures\\dtef.jpg").getImage());
 		fr.setVisible(true);
 		fr.setLocationRelativeTo(null);
 		fr.getContentPane().setBackground(Color.WHITE);
+		fr.getContentPane().setLayout(null);
+		
+		//Creating a JTable instance and pointing it to the database
+		JTable table = DBConnection.getDBTable();
+		JScrollPane jt = new JScrollPane(table);
+		jt.setBounds(0, 0, 1500, 500);
 		
 		//Add table created in DBConnection class to JScrollPanel and then to the JFrame
-		fr.add(new JScrollPane(DBConnection.getDBTable()));	
+		fr.getContentPane().add(jt);	
+		
+		//Save and Print operation
+		JButton print = new JButton ("Print");
+		print.setBounds(700, 550, 150, 50);
+		fr.getContentPane().add(print);
+		print.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MessageFormat lead = new MessageFormat("Incoming Mail Database");
+				MessageFormat tail = new MessageFormat("Page{0,number,integer}");
+				try {
+					table.print(JTable.PrintMode.FIT_WIDTH, lead, tail);
+				} catch (PrinterException pe) {
+					
+					pe.printStackTrace();
+				}
+			}
+		});
 	}
 }
