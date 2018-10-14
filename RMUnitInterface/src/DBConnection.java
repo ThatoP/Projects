@@ -3,22 +3,15 @@
  * @aboutAuthor B. Eng (Information and Communication Engineering), ITIL
  * @user Records Management Unit
  */
-//import java.sql.*;
-//import java.sql.Connection;
-//import java.sql.DriverManager;
-//import java.sql.PreparedStatement;
-//import java.sql.ResultSet;
-//import java.sql.SQLException;
-//import java.sql.Statement;
+
 import java.awt.Font;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.table.TableModel;
-
 import net.proteanit.sql.DbUtils;
-//import com.mysql.cj.xdevapi.Statement;
+
 
 public class DBConnection {
 	
@@ -26,6 +19,7 @@ public class DBConnection {
 	static PreparedStatement stmt = null;
 	static Statement myStmt = null;
 	static ResultSet res = null;
+	static String user = "";
 		
 	public static void createConnection() {
 		try{
@@ -51,7 +45,7 @@ public class DBConnection {
 			
 			//INSERT INTO RMUNIT VALUES ('RefNum','DateOnLetter','OrigDept','Subject','DateRec','ActionOfficer','DateMarked','Days');
 			String dbop = "INSERT INTO rmunit.inmail VALUES ('" + data[0] + "','" + data[1] + "', '" + data[2] + "', '" + data[3] + "', '"
-					+ data[4] + "', '"+ data[5] +"', '" + data[6] + "', '" + data[7] + "','"+ data[8] +"', '"+ data[9] +"')";
+					+ data[4] + "', '"+ data[5] +"', '" + data[6] + "', '" + data[7] + "','"+ data[8] +"', '"+ data[9] +"', '"+user+"')";
 			
 			//Executing the statement
 			myStmt.executeUpdate(dbop);
@@ -61,20 +55,19 @@ public class DBConnection {
 		}
 		catch (SQLException ex) {
 			JOptionPane.showMessageDialog(null, "This record has not been saved!", "WARNING", 0);
-			ex.printStackTrace();
+			//ex.printStackTrace();
 		}
 	}
 	
 	public static void updateRecord(String[] data) {
 		createConnection();
-		//String[] inputData = new String[10];
 		
 		try {
 			// Get Connection
 			myStmt = con.createStatement();
 			
 			//Prepare statement
-			String dbop = "UPDATE rmunit.inmail SET DateMarked = '"+data[6]+"',Days = '"+data[7]+"', ActDate = '"+data[8]+"', DaysToAct = '"+data[9]+"' WHERE RefNumber = '"+data[0]+"'";
+			String dbop = "UPDATE rmunit.inmail SET DateMarked = '"+data[6]+"',Days = '"+data[7]+"', ActDate = '"+data[8]+"', DaysToAct = '"+data[9]+"', RegBy = '"+user+"' WHERE RefNumber = '"+data[0]+"'";
 			
 			//Execute SQL query
 			myStmt.executeUpdate(dbop);
@@ -151,6 +144,46 @@ public class DBConnection {
 			Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
 			JOptionPane.showMessageDialog(null, "Oops!! Something went wrong!.", "WARNING", 0);
 		}
+	}
+	
+	public static boolean checkLogin(String uname, String pword) {
+		createConnection();
+		boolean isOk = false;
+		String pass = "";
+		
+		try {
+			//Prepare statement
+			stmt = con.prepareStatement("SELECT * FROM rmunit.users WHERE UserName='"+uname.toLowerCase().trim()+"'");
+			
+			//Execute SQL query
+			res = stmt.executeQuery();
+			
+			//Using the result set
+			int c = 0;
+			while(res.next()) {
+				pass = res.getString("Password");
+				user = res.getString("FullName");
+				c++;
+			}
+			
+			if(c==1) {
+				if(pass.equals(pword)) {
+					isOk = true;	
+				}else
+					JOptionPane.showMessageDialog(null, "Incorrect Password", "WARNING", 0);
+			} else if(c>1) {
+				isOk = false;
+				JOptionPane.showMessageDialog(null, "Duplicate User", "WARNING", 0);
+				//System.out.println("Duplicate user");
+			}else {
+				isOk = false;
+				JOptionPane.showMessageDialog(null, "User does not have access rights!", "WARNING", 0);
+				//System.out.println("User has no access rights");
+			}
+		}catch(SQLException ex) {
+			ex.printStackTrace();
+		}
+		return isOk;
 	}
 	
 	public static JTable getDBTable() {

@@ -1,6 +1,6 @@
 /**
  * @author Thato Puoetsile
- * @aboutAuthor B.Eng (Information and Communication Engineering)
+ * @aboutAuthor B.Eng (Information and Communication Engineering),ITIL
  * @user Records Management Unit
  */
 
@@ -37,7 +37,7 @@ public class MailProcessingForm extends JFrame{
 	public JTextField refText, origDeptText, subjText;
 	public JTextField actionText, daysText, days2actText;
 	public static JDateChooser letterDateText, inActDate, dateRecText, dateMarkedText;
-	public static JButton save;
+	public static JButton save, upd, del;
 	String ldt, ad,drt,dmt;
 	
 	public MailProcessingForm() {
@@ -60,12 +60,20 @@ public class MailProcessingForm extends JFrame{
 		frame.getContentPane().setLayout(null);
 		frame.getContentPane().setBackground(Color.WHITE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setExtendedState(JFrame.MAXIMIZED_HORIZ);
+		frame.setResizable(false);
 		
 		JLabel title = new JLabel("Department of Tertiary Education Financing");
 		title.setFont(new Font("Arial",Font.BOLD,40));
 		title.setBounds((w/2)-400, 50, 1000, 100);
 		frame.getContentPane().add(title);
-		String[] data = new String[10];
+		String[] data = new String[11];
+		
+		//shows who's logged in for that particular session
+		JLabel logged = new JLabel("You are logged in as "+ DBConnection.user);
+		logged.setFont(new Font("Arial",Font.PLAIN,14));
+		logged.setBounds(20, 10, 300, 50);
+		frame.getContentPane().add(logged);
 		
 		//row 1
 		JLabel ref = new JLabel("Reference Number");
@@ -86,7 +94,8 @@ public class MailProcessingForm extends JFrame{
 		
 		letterDateText = new JDateChooser();
 		letterDateText.setFont(new Font("Arial",Font.PLAIN,16));
-		letterDateText.setBounds(750,210,300,30); 
+		letterDateText.setBounds(750,210,300,30);
+		letterDateText.setMaxSelectableDate(new Date());
 		frame.getContentPane().add(letterDateText);
 		letterDateText.setDateFormatString("yyyy-MM-dd");
 		
@@ -121,6 +130,7 @@ public class MailProcessingForm extends JFrame{
 		dateRecText = new JDateChooser();
 		dateRecText.setFont(new Font("Arial",Font.PLAIN,16));
 		dateRecText.setBounds(750,390,300,30); 
+		dateRecText.setMaxSelectableDate(new Date());
 		frame.getContentPane().add(dateRecText);
 		dateRecText.setDateFormatString("yyyy-MM-dd");
 		
@@ -158,6 +168,13 @@ public class MailProcessingForm extends JFrame{
 				
 			}
 			
+			public void getName() {
+				String temp = actionText.getText();
+				
+//				if() {
+//					
+//				}
+			}
 		});
 		
 		//row 7
@@ -169,6 +186,7 @@ public class MailProcessingForm extends JFrame{
 		dateMarkedText = new JDateChooser();
 		dateMarkedText.setFont(new Font("Arial",Font.PLAIN,16));
 		dateMarkedText.setBounds(750,510,300,30); 
+		dateMarkedText.setMaxSelectableDate(new Date());
 		frame.getContentPane().add(dateMarkedText);
 		dateMarkedText.setDateFormatString("yyyy-MM-dd");
 		Document doc = ((JTextField)dateMarkedText.getDateEditor().getUiComponent()).getDocument();
@@ -224,7 +242,8 @@ public class MailProcessingForm extends JFrame{
 		
 		inActDate = new JDateChooser();
 		inActDate.setFont(new Font("Arial",Font.PLAIN,16));
-		inActDate.setBounds(750,630,300,30); 
+		inActDate.setBounds(750,630,300,30);
+		inActDate.setMaxSelectableDate(new Date());
 		frame.getContentPane().add(inActDate);
 		inActDate.setDateFormatString("yyyy-MM-dd");
 		Document dc = ((JTextField)inActDate.getDateEditor().getUiComponent()).getDocument();
@@ -247,11 +266,9 @@ public class MailProcessingForm extends JFrame{
 			public void calc () {
 				Instant start;
 				Instant end;
-				//if (((JTextField)dateMarkedText.getDateEditor().getUiComponent()).getText() != null && 
-						//((JTextField)inActDate.getDateEditor().getUiComponent()).getText() != null) {
+
 					
 				if (((JTextField)inActDate.getDateEditor().getUiComponent()).getText().charAt(0)=='0') {
-						//((JTextField)inActDate.getDateEditor().getUiComponent()).setText("1000-01-01");
 						days2actText.setText(null);
 						System.out.println("Action date field is empty!");
 					}
@@ -282,7 +299,6 @@ public class MailProcessingForm extends JFrame{
 		save.setFont(new Font("Arial",Font.BOLD,14));
 		save.setBounds(100, 800, 150, 50);
 		frame.getContentPane().add(save);
-		//for now, the save button requires that date fields never be null
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ldt = ((JTextField)letterDateText.getDateEditor().getUiComponent()).getText();
@@ -300,21 +316,25 @@ public class MailProcessingForm extends JFrame{
 				data[7] = daysText.getText();
 				data[8] = ad;
 				data[9] = days2actText.getText();
+				data[10] = DBConnection.user;
 				
-				DBConnection.saveRecord(data);
-				
-				refText.setText(null);
-				letterDateText.setDate(null);
-				origDeptText.setText(null);
-				subjText.setText(null);
-				dateRecText.setDate(null);
-				actionText.setText(null);
-				dateMarkedText.setDate(null);
-				daysText.setText(null);
-				inActDate.setDate(null);
-				days2actText.setText(null);
-				daysText.setEditable(true);
-				days2actText.setEditable(true);
+				if(!(data[0].equals(null))) {
+					DBConnection.saveRecord(data);
+					refText.setText(null);
+					letterDateText.setDate(null);
+					origDeptText.setText(null);
+					subjText.setText(null);
+					dateRecText.setDate(null);
+					actionText.setText(null);
+					dateMarkedText.setDate(null);
+					daysText.setText(null);
+					inActDate.setDate(null);
+					days2actText.setText(null);
+					daysText.setEditable(true);
+					days2actText.setEditable(true);
+				} else{
+					JOptionPane.showMessageDialog(null, "Record not saved. Reference Number field should not be empty.", "WARNING", 0);
+				}
 			}
 		});
 		
@@ -339,7 +359,7 @@ public class MailProcessingForm extends JFrame{
 					daysText.setText(data[7]);
 					((JTextField)inActDate.getDateEditor().getUiComponent()).setText(data[8]);
 					days2actText.setText(data[9]);
-				} 
+				}
 			}
 		});
 		
@@ -350,6 +370,8 @@ public class MailProcessingForm extends JFrame{
 		frame.getContentPane().add(clear);
 		clear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				upd.setEnabled(true);
+				
 				refText.setText(null);
 				letterDateText.setDate(null);
 				origDeptText.setText(null);
@@ -360,13 +382,21 @@ public class MailProcessingForm extends JFrame{
 				daysText.setText(null);
 				inActDate.setDate(null);
 				days2actText.setText(null);
+				
+				refText.setEditable(true);;
+				((JTextField)letterDateText.getDateEditor().getUiComponent()).setEditable(true);;
+				origDeptText.setEditable(true);
+				subjText.setEditable(true);
+				((JTextField)dateRecText.getDateEditor().getUiComponent()).setEditable(true);
+				actionText.setEditable(true);;
+				((JTextField)dateMarkedText.getDateEditor().getUiComponent()).setEditable(true);
 				daysText.setEditable(true);
 				days2actText.setEditable(true);
 			}
 		});
 		
 		//The Delete button deletes a record from the database
-		JButton del = new JButton("Delete Record");
+		del = new JButton("Delete Record");
 		del.setFont(new Font("Arial",Font.BOLD,14));
 		del.setBackground(Color.RED);
 		del.setBounds(900, 800, 150, 50);
@@ -374,32 +404,39 @@ public class MailProcessingForm extends JFrame{
 		del.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String ref = refText.getText();
-				if(ref != null) {
-					int n = JOptionPane.showConfirmDialog(null,"The information displayed will be deleted from the database.\n "
-							+ "Do you want to delete this record?", "Warning!",JOptionPane.YES_NO_OPTION, 
-							JOptionPane.WARNING_MESSAGE);
-					if (n== JOptionPane.YES_OPTION) {
-						DBConnection.deleteRecord(ref);
-						JOptionPane.showMessageDialog(null, "This record has been deleted permanently", "DELETE SUCCESSFUL", 1);
-						refText.setText(null);
-						letterDateText.setDate(null);
-						origDeptText.setText(null);
-						subjText.setText(null);
-						dateRecText.setDate(null);
-						actionText.setText(null);
-						dateMarkedText.setDate(null);
-						daysText.setText(null);
-						inActDate.setDate(null);
-						days2actText.setText(null);
-						daysText.setEditable(true);
-						days2actText.setEditable(true);
+				if(DBConnection.user.equals("Seneo Letang")) {
+					if(!(ref.equals(null))) {
+						int n = JOptionPane.showConfirmDialog(null,"The information displayed will be deleted from the database.\n "
+								+ "Do you want to delete this record?", "Warning!",JOptionPane.YES_NO_OPTION, 
+								JOptionPane.WARNING_MESSAGE);
+						if (n== JOptionPane.YES_OPTION) {
+							DBConnection.deleteRecord(ref);
+							JOptionPane.showMessageDialog(null, "This record has been deleted permanently", "DELETE SUCCESSFUL", 1);
+							refText.setText(null);
+							letterDateText.setDate(null);
+							origDeptText.setText(null);
+							subjText.setText(null);
+							dateRecText.setDate(null);
+							actionText.setText(null);
+							dateMarkedText.setDate(null);
+							daysText.setText(null);
+							inActDate.setDate(null);
+							days2actText.setText(null);
+							daysText.setEditable(true);
+							days2actText.setEditable(true);
+						}
+					}else {
+						JOptionPane.showMessageDialog(null, "The record of that Reference Number does not exist.", "DELETE SUCCESSFUL", 1);
+						
 					}
+				}else {
+					JOptionPane.showMessageDialog(null, "You do not have access rights to make a deletion.", "WARNING", 0);
 				}
 			}
 		});
 		
 		//The Update button updates a record in the database
-		JButton upd = new JButton("Update Record");
+		upd = new JButton("Update Record");
 		upd.setFont(new Font("Arial",Font.BOLD,14));
 		upd.setBounds(500, 800, 150, 50);
 		frame.getContentPane().add(upd);
@@ -440,7 +477,7 @@ public class MailProcessingForm extends JFrame{
 		});
 		
 		//Home button and its action listener
-		JButton home = new JButton("Home");
+		JButton home = new JButton("Log Out");
 		home.setFont(new Font("Arial",Font.BOLD,14));
 		home.setBounds(1250, 800, 150, 50);
 		frame.getContentPane().add(home);
@@ -448,7 +485,7 @@ public class MailProcessingForm extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				//frame.dispose();
 				int n = JOptionPane.showConfirmDialog(null,"The information you have entered may not have been saved. \n"  +
-													"Do you want to leave this page anyway?", "Warning!",JOptionPane.YES_NO_OPTION, 
+													"Do you want to log out anyway?", "Warning!",JOptionPane.YES_NO_OPTION, 
 													JOptionPane.WARNING_MESSAGE);
 				if(n== JOptionPane.YES_OPTION) {
 					frame.dispose();
@@ -456,7 +493,7 @@ public class MailProcessingForm extends JFrame{
 					
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							HomeScreen home = new HomeScreen();
+							new Login();
 							home.setVisible(true);
 						}
 					});

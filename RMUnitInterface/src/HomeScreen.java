@@ -1,6 +1,6 @@
 /**
  * @author Thato Puoetsile
- * @aboutAuthor B.Eng (Information and Communication Engineering) 
+ * @aboutAuthor B.Eng (Information and Communication Engineering), ITIL 
  * @user Records Management Unit
  */
 import java.awt.*;
@@ -11,6 +11,7 @@ public class HomeScreen extends JFrame{
 
 	int width, height;
 	static HomeScreen home;
+	static JFrame fr = new JFrame();
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -27,17 +28,19 @@ public class HomeScreen extends JFrame{
 		ImageIcon img = new ImageIcon("C:\\Users\\tpuoetsile\\Pictures\\DTEF Logo.jpg");
 		width = img.getIconWidth();
 		height = img.getIconHeight();
-		setSize(width,height);
-		setTitle("Records Management Unit Database - Home");
-		setLocationRelativeTo(null);
-		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		fr.setSize(width,height);
+		fr.setTitle("Records Management Unit Database - Home");
+		fr.setLocationRelativeTo(null);
+		fr.setVisible(true);
+		fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		fr.setExtendedState(JFrame.MAXIMIZED_HORIZ);
+		fr.setResizable(false);
 		
-		setLayout(new FlowLayout());
-		this.setIconImage(new ImageIcon("C:\\Users\\tpuoetsile\\Pictures\\dtef.jpg").getImage()); 
+		fr.setLayout(new FlowLayout());
+		fr.setIconImage(new ImageIcon("C:\\Users\\tpuoetsile\\Pictures\\dtef.jpg").getImage()); 
 		JLabel back = new JLabel(img);
 		back.setLayout(null);
-		add(back);
+		fr.add(back);
 		
 		//a button to usher user to a new Mail Processing form
 		JButton newForm = new JButton("Mail Processing Form");
@@ -48,7 +51,7 @@ public class HomeScreen extends JFrame{
 				home.dispose();
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						MailProcessingForm form = new MailProcessingForm();
+						new Login();
 					}
 				});
 			}
@@ -60,7 +63,7 @@ public class HomeScreen extends JFrame{
 		back.add(closeApp);
 		closeApp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dispose();
+				fr.dispose();
 		        System.exit(0);
 			}
 		});
